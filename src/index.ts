@@ -5,11 +5,11 @@ const main = async () => {
   const port = 3000;
 
   app.get("/", (_, res) => {
-    res.json({ msg: "Hello World!" });
+    res.json({ msg: "Hello API!" });
   });
 
   app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
+    console.log(`App listening at http://localhost:${port}`);
   });
 };
 
