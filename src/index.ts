@@ -4,6 +4,7 @@ import { dataFetcher } from "./DataFetcher/getData";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import path from "path";
 
 const main = async () => {
   // INITIALIZE THE APP
@@ -16,9 +17,13 @@ const main = async () => {
   app.use(morgan("combined"));
 
   // ROUTES
-  app.get("/", async (req, res) => {
+  app.get("/", async (_, res) => {
+    return res.sendFile(path.dirname(__dirname) + "/static/index.html");
+  });
+
+  app.get("/v1/getproxies", async (req, res) => {
     //@ts-ignore
-    res.send(await dataFetcher(req));
+    return res.send(await dataFetcher(req));
   });
 
   // START THE APP
