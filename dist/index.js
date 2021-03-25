@@ -13,12 +13,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+require("dotenv/config");
+const getData_1 = require("./DataFetcher/getData");
+const cors_1 = __importDefault(require("cors"));
+const helmet_1 = __importDefault(require("helmet"));
+const morgan_1 = __importDefault(require("morgan"));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const app = express_1.default();
     const port = 3000;
-    app.get("/", (_, res) => {
-        res.json({ msg: "Hello API!" });
-    });
+    app.use(helmet_1.default());
+    app.use(cors_1.default());
+    app.use(morgan_1.default("combined"));
+    app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        res.send(yield getData_1.dataFetcher(req));
+    }));
     app.listen(port, () => {
         console.log(`App listening at http://localhost:${port}`);
     });
