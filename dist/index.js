@@ -12,27 +12,42 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require("reflect-metadata");
 const express_1 = __importDefault(require("express"));
 require("dotenv/config");
-const getData_1 = require("./DataFetcher/getData");
+const getData_1 = require("./utils/getData");
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
 const morgan_1 = __importDefault(require("morgan"));
 const path_1 = __importDefault(require("path"));
+const auth_1 = require("./routes/auth");
+const typeorm_1 = require("typeorm");
+const constants_1 = require("./constants");
+const Users_1 = require("./models/Users");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
+    const _ = yield typeorm_1.createConnection({
+        type: "postgres",
+        database: process.env.DATABASE_NAME,
+        username: process.env.DATABASE_USERNAME,
+        password: process.env.DATABASE_PASSWORD,
+        logging: !constants_1.__prod__,
+        synchronize: true,
+        entities: [Users_1.User],
+    });
     const app = express_1.default();
-    const port = 3000;
+    app.use(express_1.default.json());
     app.use(helmet_1.default());
     app.use(cors_1.default());
     app.use(morgan_1.default("combined"));
+    app.use("/v1/user", auth_1.authRouter);
     app.get("/", (_, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.sendFile(path_1.default.dirname(__dirname) + "/static/index.html");
     }));
     app.get("/v1/getproxies", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.send(yield getData_1.dataFetcher(req));
     }));
-    app.listen(port, () => {
-        console.log(`App listening at http://localhost:${port}`);
+    app.listen(constants_1.__PORT__, () => {
+        console.log(`App listening at http://localhost:${constants_1.__PORT__}`);
     });
 });
 main().catch((e) => console.log(e.message));
