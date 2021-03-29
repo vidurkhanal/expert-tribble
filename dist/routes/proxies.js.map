@@ -1,0 +1,1 @@
+{"version":3,"file":"proxies.js","sourceRoot":"","sources":["../../src/routes/proxies.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,qCAAiC;AACjC,8CAA+C;AAC/C,oEAAiE;AAEpD,QAAA,WAAW,GAAG,gBAAM,EAAE,CAAC;AAGpC,mBAAW,CAAC,GAAG,CAAC,GAAG,EAAE,iCAAe,EAAE,CAAO,GAAG,EAAE,GAAG,EAAE,EAAE;IAEvD,OAAO,GAAG,CAAC,IAAI,CAAC,MAAM,qBAAW,CAAC,GAAG,CAAC,CAAC,CAAC;AAC1C,CAAC,CAAA,CAAC,CAAC"}

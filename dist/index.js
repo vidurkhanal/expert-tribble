@@ -24,6 +24,8 @@ const auth_1 = require("./routes/auth");
 const typeorm_1 = require("typeorm");
 const constants_1 = require("./constants");
 const Users_1 = require("./models/Users");
+const user_1 = require("./routes/user");
+const proxies_1 = require("./routes/proxies");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const _ = yield typeorm_1.createConnection({
         type: "postgres",
@@ -39,7 +41,9 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     app.use(helmet_1.default());
     app.use(cors_1.default());
     app.use(morgan_1.default("combined"));
-    app.use("/v1/user", auth_1.authRouter);
+    app.use("/v1/auth", auth_1.authRouter);
+    app.use("/v1/user", user_1.userRouter);
+    app.use("/v1/proxies", proxies_1.proxyRouter);
     app.get("/", (_, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.sendFile(path_1.default.dirname(__dirname) + "/static/index.html");
     }));

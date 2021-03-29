@@ -8,6 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authRouter = void 0;
 const express_1 = require("express");
@@ -15,6 +18,7 @@ const Users_1 = require("../models/Users");
 const argon2_1 = require("argon2");
 const typeorm_1 = require("typeorm");
 const validation_1 = require("../utils/validation");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 exports.authRouter = express_1.Router();
 exports.authRouter.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let user = null;
@@ -97,8 +101,9 @@ exports.authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0
             },
         });
     }
-    return res.json({
-        user: user.id,
+    const token = jsonwebtoken_1.default.sign({ id: user.id }, process.env.TOKEN_SECRET);
+    return res.header({ auth_token: token }).json({
+        token,
     });
 }));
 //# sourceMappingURL=auth.js.map

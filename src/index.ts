@@ -10,6 +10,8 @@ import { authRouter } from "./routes/auth";
 import { createConnection } from "typeorm";
 import { __PORT__, __prod__ } from "./constants";
 import { User } from "./models/Users";
+import { userRouter } from "./routes/user";
+import { proxyRouter } from "./routes/proxies";
 
 const main = async () => {
   const _ = await createConnection({
@@ -32,9 +34,11 @@ const main = async () => {
   app.use(helmet());
   app.use(cors());
   app.use(morgan("combined"));
-  app.use("/v1/user", authRouter);
 
   // ROUTES
+  app.use("/v1/auth", authRouter);
+  app.use("/v1/user", userRouter);
+  app.use("/v1/proxies", proxyRouter);
   app.get("/", async (_, res) => {
     return res.sendFile(path.dirname(__dirname) + "/static/index.html");
   });

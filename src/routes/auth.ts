@@ -3,6 +3,7 @@ import { User } from "../models/Users";
 import { hash, verify } from "argon2";
 import { getConnection } from "typeorm";
 import { LoginValidation, RegistrationValidation } from "../utils/validation";
+import jwt from "jsonwebtoken";
 
 export const authRouter = Router();
 
@@ -93,8 +94,9 @@ authRouter.post("/login", async (req, res) => {
       },
     });
   }
+  const token = jwt.sign({ id: user.id }, process.env.TOKEN_SECRET as string);
 
-  return res.json({
-    user: user.id,
+  return res.header({ auth_token: token }).json({
+    token,
   });
 });
