@@ -4,10 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isAuthenticated = void 0;
-const constants_1 = require("../constants");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const isAuthenticated = (req, res, next) => {
-    const token = req.header(constants_1.TOKEN_NAME);
+    const token = req.header("auth_token");
     if (!token) {
         return res.status(401).json({
             msg: "YOU ARE NOT AUTHENTICATED TO PERFORM THE REQUESTED ACTION",

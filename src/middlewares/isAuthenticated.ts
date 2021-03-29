@@ -1,4 +1,3 @@
-import { TOKEN_NAME } from "../constants";
 import jwt from "jsonwebtoken";
 import { betterRequest, betterResponse } from "../types";
 
@@ -7,7 +6,7 @@ export const isAuthenticated = (
   res: betterResponse,
   next: any
 ) => {
-  const token = req.header(TOKEN_NAME);
+  const token = req.header("auth_token");
   if (!token) {
     return res.status(401).json({
       msg: "YOU ARE NOT AUTHENTICATED TO PERFORM THE REQUESTED ACTION",
