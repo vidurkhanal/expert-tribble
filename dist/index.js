@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 const express_1 = __importDefault(require("express"));
 require("dotenv/config");
-const getData_1 = require("./utils/getData");
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
 const morgan_1 = __importDefault(require("morgan"));
@@ -26,6 +25,9 @@ const constants_1 = require("./constants");
 const Users_1 = require("./models/Users");
 const user_1 = require("./routes/user");
 const proxies_1 = require("./routes/proxies");
+const express_session_1 = __importDefault(require("express-session"));
+const connect_redis_1 = __importDefault(require("connect-redis"));
+const redis_1 = __importDefault(require("redis"));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const _ = yield typeorm_1.createConnection({
         type: "postgres",
@@ -36,19 +38,35 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         synchronize: true,
         entities: [Users_1.User],
     });
+    const RedisStore = connect_redis_1.default(express_session_1.default);
+    const RedisClient = redis_1.default.createClient();
     const app = express_1.default();
+    app.use(express_session_1.default({
+        name: constants_1.COOKIE_NAME,
+        saveUninitialized: false,
+        store: new RedisStore({
+            client: RedisClient,
+            disableTTL: true,
+            disableTouch: true,
+        }),
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
+            sameSite: "lax",
+            httpOnly: true,
+            secure: constants_1.__prod__,
+        },
+        secret: process.env.COOKIE_SECRET,
+        resave: true,
+    }));
     app.use(express_1.default.json());
     app.use(helmet_1.default());
-    app.use(cors_1.default());
+    app.use(cors_1.default({ credentials: true }));
     app.use(morgan_1.default("combined"));
     app.use("/v1/auth", auth_1.authRouter);
     app.use("/v1/user", user_1.userRouter);
     app.use("/v1/proxies", proxies_1.proxyRouter);
     app.get("/", (_, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.sendFile(path_1.default.dirname(__dirname) + "/static/index.html");
-    }));
-    app.get("/v1/getproxies", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        return res.send(yield getData_1.dataFetcher(req));
     }));
     app.listen(constants_1.__PORT__, () => {
         console.log(`App listening at http://localhost:${constants_1.__PORT__}`);

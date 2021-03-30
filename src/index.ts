@@ -1,17 +1,19 @@
 import "reflect-metadata";
 import express from "express";
 import "dotenv/config";
-import { dataFetcher } from "./utils/getData";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import path from "path";
 import { authRouter } from "./routes/auth";
 import { createConnection } from "typeorm";
-import { __PORT__, __prod__ } from "./constants";
+import { COOKIE_NAME, __PORT__, __prod__ } from "./constants";
 import { User } from "./models/Users";
 import { userRouter } from "./routes/user";
 import { proxyRouter } from "./routes/proxies";
+import session from "express-session";
+import connRedis from "connect-redis";
+import redis from "redis";
 
 const main = async () => {
   const _ = await createConnection({
@@ -24,15 +26,38 @@ const main = async () => {
     entities: [User],
   });
 
+  const RedisStore = connRedis(session);
+  const RedisClient = redis.createClient();
+
   // await User.delete({});
 
   // INITIALIZE THE APP
   const app = express();
 
+  app.use(
+    session({
+      name: COOKIE_NAME,
+      saveUninitialized: false,
+      store: new RedisStore({
+        client: RedisClient,
+        disableTTL: true,
+        disableTouch: true,
+      }),
+      cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
+        sameSite: "lax",
+        httpOnly: true, //CAN'T BE ACCESSED BY FRONTEND
+        secure: __prod__,
+      },
+      secret: process.env.COOKIE_SECRET as string,
+      resave: true,
+    })
+  );
+
   // MIDDLE WARES
   app.use(express.json());
   app.use(helmet());
-  app.use(cors());
+  app.use(cors({ credentials: true }));
   app.use(morgan("combined"));
 
   // ROUTES
@@ -41,11 +66,6 @@ const main = async () => {
   app.use("/v1/proxies", proxyRouter);
   app.get("/", async (_, res) => {
     return res.sendFile(path.dirname(__dirname) + "/static/index.html");
-  });
-
-  app.get("/v1/getproxies", async (req, res) => {
-    //@ts-ignore
-    return res.send(await dataFetcher(req));
   });
 
   // START THE APP
