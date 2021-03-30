@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import { User } from "../models/Users";
 import { betterRequest, betterResponse } from "../types";
 
 export const isAuthenticated = (
@@ -6,18 +6,17 @@ export const isAuthenticated = (
   res: betterResponse,
   next: any
 ) => {
-  const token = req.header("auth_token");
-  if (!token) {
-    return res.status(401).json({
-      msg: "YOU ARE NOT AUTHENTICATED TO PERFORM THE REQUESTED ACTION",
-    });
+  const userID = req.session.userId;
+  if (!userID) {
+    return res
+      .status(401)
+      .json({ msg: "User not authenticated. Please authenticate the user." });
   }
-  try {
-    const verified = jwt.verify(token, process.env.TOKEN_SECRET as string);
-    // @ts-ignore
-    req.userID = verified?.id as string;
-  } catch (err) {
-    return res.status(400).json({ msg: "Invalid JSON Web Token." });
+  const user = User.findOne({ where: { id: userID } });
+  if (!user) {
+    return res.status(400).json({ msg: "User cannot be found." });
   }
+  // @ts-ignore
+  req.user = user;
   return next();
 };

@@ -1,24 +1,19 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isAuthenticated = void 0;
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const Users_1 = require("../models/Users");
 const isAuthenticated = (req, res, next) => {
-    const token = req.header("auth_token");
-    if (!token) {
-        return res.status(401).json({
-            msg: "YOU ARE NOT AUTHENTICATED TO PERFORM THE REQUESTED ACTION",
-        });
+    const userID = req.session.userId;
+    if (!userID) {
+        return res
+            .status(401)
+            .json({ msg: "User not authenticated. Please authenticate the user." });
     }
-    try {
-        const verified = jsonwebtoken_1.default.verify(token, process.env.TOKEN_SECRET);
-        req.userID = verified === null || verified === void 0 ? void 0 : verified.id;
+    const user = Users_1.User.findOne({ where: { id: userID } });
+    if (!user) {
+        return res.status(400).json({ msg: "User cannot be found." });
     }
-    catch (err) {
-        return res.status(400).json({ msg: "Invalid JSON Web Token." });
-    }
+    req.user = user;
     return next();
 };
 exports.isAuthenticated = isAuthenticated;

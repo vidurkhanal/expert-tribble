@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.isAdmin = void 0;
 const constants_1 = require("../constants");
 const isAdmin = (req, res, next) => {
-    const token = req.header("admin_password");
+    const token = req.body.ADMIN_PASSWORD;
     if (!token) {
         return res.status(401).json({
             msg: "YOU ARE NOT AUTHENTICATED TO PERFORM THE REQUESTED ACTION",
