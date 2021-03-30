@@ -48,7 +48,7 @@ const main = async () => {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
         sameSite: "lax",
         httpOnly: true, //CAN'T BE ACCESSED BY FRONTEND
-        secure: __prod__,
+        secure: false,
       },
       secret: process.env.COOKIE_SECRET as string,
       resave: true,

@@ -54,7 +54,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
             sameSite: "lax",
             httpOnly: true,
-            secure: constants_1.__prod__,
+            secure: false,
         },
         secret: process.env.COOKIE_SECRET,
         resave: true,
