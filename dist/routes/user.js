@@ -16,11 +16,11 @@ const isAuthenticated_1 = require("../middlewares/isAuthenticated");
 const isAdmin_1 = require("../middlewares/isAdmin");
 exports.userRouter = express_1.Router();
 exports.userRouter.get("/who-am-i", isAuthenticated_1.isAuthenticated, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield Users_1.User.findOne({ where: { id: req.userID } });
+    const user = yield Users_1.User.findOne({ where: { id: req.session.userId } });
     if (!user) {
         return res
             .status(400)
-            .json({ msg: "The JSON Web Token couln't be verified" });
+            .json({ msg: "User can not be found on the database" });
     }
     const { email, fullName, createdDate } = user;
     return res.send({ email, fullName, createdDate });

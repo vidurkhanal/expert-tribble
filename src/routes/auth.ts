@@ -3,7 +3,8 @@ import { User } from "../models/Users";
 import { hash, verify } from "argon2";
 import { getConnection } from "typeorm";
 import { LoginValidation, RegistrationValidation } from "../utils/validation";
-import jwt from "jsonwebtoken";
+import { betterRequest } from "../types";
+import { isAdmin } from "../middlewares/isAdmin";
 
 export const authRouter = Router();
 
@@ -52,11 +53,11 @@ authRouter.post("/register", async (req, res) => {
   });
 });
 
-authRouter.get("/allusers", async (_, res) => {
+authRouter.get("/allusers", isAdmin, async (_, res) => {
   return res.json(await User.find({}));
 });
 
-authRouter.post("/login", async (req, res) => {
+authRouter.post("/login", async (req: betterRequest, res) => {
   const email = req?.body.email;
   const password = req?.body.password;
 
@@ -94,9 +95,7 @@ authRouter.post("/login", async (req, res) => {
       },
     });
   }
-  const token = jwt.sign({ id: user.id }, process.env.TOKEN_SECRET as string);
 
-  return res.header({ auth_token: token }).json({
-    token,
-  });
+  req.session.userId = user.id;
+  return res.status(200).json({ userID: user.id });
 });

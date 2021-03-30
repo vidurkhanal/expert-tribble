@@ -12,11 +12,11 @@ userRouter.get(
   //@ts-ignore
   isAuthenticated,
   async (req: betterRequest, res) => {
-    const user = await User.findOne({ where: { id: req.userID } });
+    const user = await User.findOne({ where: { id: req.session.userId } });
     if (!user) {
       return res
         .status(400)
-        .json({ msg: "The JSON Web Token couln't be verified" });
+        .json({ msg: "User can not be found on the database" });
     }
     const { email, fullName, createdDate } = user;
     return res.send({ email, fullName, createdDate });

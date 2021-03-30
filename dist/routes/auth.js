@@ -8,9 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authRouter = void 0;
 const express_1 = require("express");
@@ -18,7 +15,7 @@ const Users_1 = require("../models/Users");
 const argon2_1 = require("argon2");
 const typeorm_1 = require("typeorm");
 const validation_1 = require("../utils/validation");
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const isAdmin_1 = require("../middlewares/isAdmin");
 exports.authRouter = express_1.Router();
 exports.authRouter.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let user = null;
@@ -63,7 +60,7 @@ exports.authRouter.post("/register", (req, res) => __awaiter(void 0, void 0, voi
         user: user === null || user === void 0 ? void 0 : user.id,
     });
 }));
-exports.authRouter.get("/allusers", (_, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.authRouter.get("/allusers", isAdmin_1.isAdmin, (_, res) => __awaiter(void 0, void 0, void 0, function* () {
     return res.json(yield Users_1.User.find({}));
 }));
 exports.authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -101,9 +98,7 @@ exports.authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0
             },
         });
     }
-    const token = jsonwebtoken_1.default.sign({ id: user.id }, process.env.TOKEN_SECRET);
-    return res.header({ auth_token: token }).json({
-        token,
-    });
+    req.session.userId = user.id;
+    return res.status(200).json({ userID: user.id });
 }));
 //# sourceMappingURL=auth.js.map
