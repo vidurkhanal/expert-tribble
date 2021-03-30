@@ -33,6 +33,7 @@ const main = async () => {
 
   // INITIALIZE THE APP
   const app = express();
+  app.use(cors({ credentials: true }));
 
   app.use(
     session({
@@ -57,7 +58,6 @@ const main = async () => {
   // MIDDLE WARES
   app.use(express.json());
   app.use(helmet());
-  app.use(cors({ credentials: true }));
   app.use(morgan("combined"));
 
   // ROUTES
