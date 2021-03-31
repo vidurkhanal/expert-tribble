@@ -5,6 +5,7 @@ import { getConnection } from "typeorm";
 import { LoginValidation, RegistrationValidation } from "../utils/validation";
 import { betterRequest } from "../types";
 import { isAdmin } from "../middlewares/isAdmin";
+import { COOKIE_NAME } from "../constants";
 
 export const authRouter = Router();
 
@@ -98,4 +99,14 @@ authRouter.post("/login", async (req: betterRequest, res) => {
 
   req.session.userId = user.id;
   return res.status(200).json({ userID: user.id });
+});
+
+authRouter.post("/logout", async (req: betterRequest, res) => {
+  req.session.destroy((err) => {
+    res.clearCookie(COOKIE_NAME);
+    if (err) {
+      return res.status(400).send(false);
+    }
+    return res.status(200).send(true);
+  });
 });

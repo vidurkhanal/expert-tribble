@@ -16,6 +16,7 @@ const argon2_1 = require("argon2");
 const typeorm_1 = require("typeorm");
 const validation_1 = require("../utils/validation");
 const isAdmin_1 = require("../middlewares/isAdmin");
+const constants_1 = require("../constants");
 exports.authRouter = express_1.Router();
 exports.authRouter.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let user = null;
@@ -100,5 +101,14 @@ exports.authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0
     }
     req.session.userId = user.id;
     return res.status(200).json({ userID: user.id });
+}));
+exports.authRouter.post("/logout", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    req.session.destroy((err) => {
+        res.clearCookie(constants_1.COOKIE_NAME);
+        if (err) {
+            return res.status(400).send(false);
+        }
+        return res.status(200).send(true);
+    });
 }));
 //# sourceMappingURL=auth.js.map
